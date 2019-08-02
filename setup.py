@@ -8,7 +8,8 @@ setup(
     version='0.0.1',
     packages=[],
     py_modules=[
-        'controle_system'
+        'controle_system',
+        'rotation'
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -29,6 +30,7 @@ setup(
     entry_points={
         'console_scripts': [
             'controle_system = controle_system:main',
+            'rotation = rotation:main'
         ],
     },
 )
