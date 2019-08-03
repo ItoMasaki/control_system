@@ -20,49 +20,49 @@ class Rotation(Node):
         self.create_subscription(Odometry,"odom",self.now_angular,qos_profile_sensor_data)
         self.angular=None
 
-    def now_angular(self,massage):		
-        self.angular = math.degrees(2*math.asin(massage.pose.pose.orientation.z))
 
     def turn_designate_angular(self,massage):
 
-        #prepare angular in order not to accross 180 line.
-        sum=self.angular+massage
-        if sum>180:
-            sum=sum-360
-        if sum<-180:
-            sum=sum+360
-
-        total_angular=(sum-self.angular)/2
+        _total_angular=abs(massage)/2
 
         #set velocity param
-        velocity=0
-        vel=[]
-        vel_sum=0
+        _velocity=0
+        _vel_f=[]
+        _vel_s=[]
+        _vel_sum=0
+        _sign=1/2
+        if massage<=0:
+            _sign=-_sign
         
         #first half
-        #acceleration is 1/2sin(4pi/total_angular)+1/2 
-        for i in range(1,total_angular+1):
-            acceleration=(1/2)*math.sin(math.radians(i*4*math.pi/total_angular))+1/2
-            velocity=velocity+acceleration*math.radians(1)/velocity
-            vel.append(2*total_angular*velocity)
-            vel_sum=vel_sum+velocity
+        _vel_sum,_vel_f=self.set_velocity(_sign,_velocity,_vel_sum,_total_angular)
         
-        velocity=vel[total_angular]
+        _velocity=_vel_f[_total_angular]
         
         #second half
-        #acceleration is -1/2sin(4pi/total_angular)-1/2
-        for i in range(1,total_angular+1):
-            acceleration=(-1/2)*math.sin(math.radians(i*4*math.pi/total_angular))-1/2
-            velocity=velocity+acceleration*math.radians(1)/velocity
-            vel.append(2*total_angular*velocity)
-            vel_sum_s=vel_sum_s+velocity
-
+        _vel_sum,_vel_s=self.set_velocity(-_sign,_velocity,_vel_sum,_total_angular)
+        
+        _vel=_vel_f+_vel_s
         #publish
-        for i in vel:
+        for i in _vel:
             angular_vel=Twist()
             angular_vel.linear.x=0.0
-            angular_vel.angular.z=vel/vel_sum
+            angular_vel.angular.z=i/_vel_sum
             self.pub.publish(angular_vel)
+        
+    @staticmethod
+    def set_velocity(sign,velocity,vel_sum,total_angular):
+        vel=[]    
+        for i in range(1,total_angular+1):
+            __acceleration=sign*math.sin(math.radians(i*4*math.pi/total_angular))+sign
+            velocity=velocity+__acceleration*math.radians(1)/velocity
+            vel.append(2*total_angular*velocity)
+            vel_sum=vel_sum+velocity            
+        return vel_sum,vel
+
+    def now_angular(self,massage):		
+        self.angular = math.degrees(2*math.asin(massage.pose.pose.orientation.z))
+
 
 def main():
     rclpy.init()
