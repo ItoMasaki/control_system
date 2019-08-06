@@ -11,6 +11,8 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 
+from std_msgs.msg import String
+
 
 class Control_System(Node):
     def __init__(self):
@@ -19,7 +21,7 @@ class Control_System(Node):
         self.create_subscription(
             String,
             'control_system/command',
-            self.cmmand_callback,
+            self.command_callback,
             qos_profile_sensor_data
         )
 

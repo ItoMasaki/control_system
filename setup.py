@@ -9,11 +9,16 @@ setup(
     packages=[],
     py_modules=['control_system'],
     install_requires=['setuptools'],
+    data_files=[
+        ('lib/' + package_name, ['package.xml']),
+        ('lib/' + package_name+'/modules',
+         ['modules/calculate_speed.py'])
+    ],
     zip_safe=True,
     author='ItoMasaki',
     author_email='is0449sh@ed.ritsumei.ac.jp',
     maintainer='ItoMasaki,MatsudaYamato',
-    maintainer_email='is0449sh@ed.ritsumei.ac.jp','is0476hv@ed.ritsumei.ac.jp',
+    maintainer_email='is0449sh@ed.ritsumei.ac.jp,is0476hv@ed.ritsumei.ac.jp',
     keywords=['ROS2'],
     classifiers=[
         'Intended Audience :: Developers',
