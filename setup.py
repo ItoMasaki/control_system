@@ -7,16 +7,13 @@ setup(
     name=package_name,
     version='0.0.1',
     packages=[],
-    py_modules=[
-        'controle_system',
-        'rotation'
-    ],
+    py_modules=['control_system'],
     install_requires=['setuptools'],
     zip_safe=True,
     author='ItoMasaki',
     author_email='is0449sh@ed.ritsumei.ac.jp',
-    maintainer='ItoMasaki',
-    maintainer_email='is0449sh@ed.ritsumei.ac.jp',
+    maintainer='ItoMasaki,MatsudaYamato',
+    maintainer_email='is0449sh@ed.ritsumei.ac.jp','is0476hv@ed.ritsumei.ac.jp',
     keywords=['ROS2'],
     classifiers=[
         'Intended Audience :: Developers',
@@ -24,13 +21,12 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    description='human detection using PoseNet and OpenCV',
+    description='control_system using ros2',
     license='Apache License, Version 2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'controle_system = controle_system:main',
-            'rotation = rotation:main'
+            'control_system = control_system:main'
         ],
     },
 )
