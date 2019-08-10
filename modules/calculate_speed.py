@@ -2,48 +2,40 @@
 """module calculate"""
 
 
-def space_time_convert(goal_angle):
-    if goal_angle >= 180:
-        goal_angle -= 360
-    elif goal_angle <= -180:
-        goal_angle += 360
+def convertor(now_angular, privious_angular, operator):
+
+    if now_angular - privious_angular < -350:
+        operator = 1
+    elif now_angular - privious_angular > 350:
+        operator = -1
     else:
         pass
-    """return difference,direction"""
-    if goal_angle >= 0:
-        return abs(goal_angle), 1
+
+    if now_angular > 360:
+        operator = -1
+    elif now_angular < -1:
+        operator = 1
     else:
-        return abs(goal_angle), -1
+        pass
+    return operator
 
 
-def calculate_next(
-    difference,
-    direction,
-    old_velocity,
-    old_accelation
-):
-    """direction is vector,others are schalar"""
-    """return velocity,accelation,true or false"""
+def differencer(goal_angular, now_angular,flag):
+    if goal_angular - now_angular > 0:
+        direction = 1
+    else:
+        direction = -1
 
-    if old_velocity >= 1:
-        return old_velocity, 0, 1  # no accelation
-
+    difference = abs(goal_angular - now_angular)
+    print(difference)
     if difference >= 10:
-        #  [TODO] : make new way of calculate
-        new_accelation = old_accelation+0.5
+        velocity = 1.0
     elif difference < 10 and difference >= 5:
-        if old_velocity > 0.3:
-            new_accelation = old_accelation-0.1
-        else:
-            pass
+        velocity = 0.3
     else:
-        if old_velocity > 0:
-            new_accelation = old_accelation-0.5
-        else:
-            old_velocity, 0, -1
-
-    new_velocity = old_velocity+accelation*0.01
-    return new_velocity, new_accelation, 1
+        velocity = 0.0
+        flag = False
+    return velocity*direction,flag
 
 
 if __name__ == '__main__':
