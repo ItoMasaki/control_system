@@ -7,7 +7,7 @@ setup(
     name=package_name,
     version='0.0.1',
     packages=[],
-    py_modules=['control_system'],
+    py_modules=['control_system','control_system2'],
     install_requires=['setuptools'],
     data_files=[
         ('lib/' + package_name, ['package.xml']),
@@ -31,7 +31,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'control_system = control_system:main'
+            'control_system = control_system:main',
+            'control_system2 = control_system2:main'
         ],
     },
 )
