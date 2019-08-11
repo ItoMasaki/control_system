@@ -17,11 +17,12 @@ from std_msgs.msg import String
 class Control_System(Node):
     def __init__(self):
         super().__init__('Control_System')
-        
+
         self.angular = 0.0
         self.privious_angular = 0
         self.goal_angular = 0
         self.rotate_flag = False
+        self.publish_flag = False
         self.operator = 0
         self.velocity = 0
         self.velocity_message = Twist()
@@ -45,21 +46,22 @@ class Control_System(Node):
             qos_profile=qos_profile_sensor_data
         )
 
-
     def command_callback(self, msg):
         print('callback')
         self.command = msg.data
         command = msg.data.split(',')
         if 'rotate' == command[0].replace('Command:', ''):
-            self.goal_angular = float(command[1].replace('Content:',''))
+            self.goal_angular = float(command[1].replace('Content:', ''))
             self.rotate_flag = True
+            self.publish_flag = True
         return
 
     def odom_crusher(self, message):
-        self.angular = math.degrees(2 * math.asin(message.pose.pose.orientation.z))
+        self.angular = math.degrees(
+            2 * math.asin(message.pose.pose.orientation.z))
         if self.rotate_flag is True:
             self.operator = calculate_speed.convertor(self.angular,
-                                                      self.privious_angular, 
+                                                      self.privious_angular,
                                                       self.operator)
 
             if self.operator == 1:
@@ -81,6 +83,20 @@ class Control_System(Node):
             self.velocity_message.angular.z = self.velocity
             self.velocity_message.linear.x = 0.0
             self.publish_velocity.publish(self.velocity_message)
+            self.cerebrum_publisher('Return:1,Content:None')
+
+    def cerebrum_publisher(self, message):
+        if self.rotate_flag is False:
+            if self.publish_flag is True:
+                self.senses_publisher = self.create_publisher(
+                    String, 'cerebrum/command', qos_profile_sensor_data)
+
+                _trans_message = String()
+                _trans_message.data = message
+
+                self.senses_publisher.publish(_trans_message)
+
+                self.publish_flag = False
 
 
 def main():
@@ -93,4 +109,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

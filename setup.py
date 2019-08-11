@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'controle_system'
+package_name = 'control_system'
 
 setup(
 
