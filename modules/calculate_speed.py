@@ -20,14 +20,14 @@ def convertor(now_angular, privious_angular, operator):
     return operator
 
 
-def differencer(goal_angular, now_angular,flag):
+def differencer(goal_angular, now_angular, flag):
     if goal_angular - now_angular > 0:
         direction = 1
     else:
         direction = -1
 
     difference = abs(goal_angular - now_angular)
-    print(difference)
+    print(difference, flush=True)
     if difference >= 10:
         velocity = 1.0
     elif difference < 10 and difference >= 5:
@@ -35,7 +35,7 @@ def differencer(goal_angular, now_angular,flag):
     else:
         velocity = 0.0
         flag = False
-    return velocity*direction,flag
+    return velocity*direction, flag
 
 
 if __name__ == '__main__':

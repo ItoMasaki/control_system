@@ -47,7 +47,7 @@ class Control_System(Node):
         )
 
     def command_callback(self, msg):
-        print('callback')
+        print('callback', flush=True)
         self.command = msg.data
         command = msg.data.split(',')
         if 'rotate' == command[0].replace('Command:', ''):
