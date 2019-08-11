@@ -95,7 +95,7 @@ class Control_System(Node):
                 _trans_message.data = message
 
                 self.senses_publisher.publish(_trans_message)
-
+                print('publish',flush=True)
                 self.publish_flag = False
 
 
