@@ -17,6 +17,20 @@ from std_msgs.msg import String
 class Control_System(Node):
     def __init__(self):
         super().__init__('Control_System')
+        
+        self.angular = 0.0
+        self.privious_angular = 0
+        self.goal_angular = 0
+        self.rotate_flag = False
+        self.operator = 0
+        self.velocity = 0
+        self.velocity_message = Twist()
+
+        self.publish_velocity = self.create_publisher(
+            Twist,
+            'cmd_vel',
+            qos_profile_sensor_data
+        )
 
         self.create_subscription(
             String,
@@ -24,7 +38,6 @@ class Control_System(Node):
             self.command_callback,
             qos_profile_sensor_data
         )
-
         self.create_subscription(
             Odometry,
             'odom',
@@ -32,22 +45,6 @@ class Control_System(Node):
             qos_profile=qos_profile_sensor_data
         )
 
-        self.pub_vel = self.create_publisher(
-            Twist,
-            'cmd_vel',
-            qos_profile_sensor_data
-        )
-
-        self.angular = 0.0
-        self.privious_angular = 0
-        self.goal_angular = 0
-
-        self.rotate_flag = False
-
-        self.operator = 0
-        self.velocity = 0
-
-        self.velocity_message = Twist()
 
     def command_callback(self, msg):
         print('callback')
@@ -59,8 +56,7 @@ class Control_System(Node):
         return
 
     def odom_crusher(self, message):
-        prinentation_z = message.pose.pose.orientation.z
-        self.angular = math.degrees(2 * math.asin(prinentation_z))
+        self.angular = math.degrees(2 * math.asin(message.pose.pose.orientation.z))
         if self.rotate_flag is True:
             self.operator = calculate_speed.convertor(self.angular,
                                                       self.privious_angular, 
@@ -84,7 +80,7 @@ class Control_System(Node):
             self.privious_angular = self.angular
             self.velocity_message.angular.z = self.velocity
             self.velocity_message.linear.x = 0.0
-            self.pub_vel.publish(self.velocity_message)
+            self.publish_velocity.publish(self.velocity_message)
 
 
 def main():
@@ -97,3 +93,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    

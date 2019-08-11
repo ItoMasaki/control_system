@@ -18,6 +18,19 @@ from std_msgs.msg import String
 class Control_System(Node):
     def __init__(self):
         super().__init__('Control_System')
+        
+        self.angular = 0.0
+        self.privious_angular = 0
+        self.operator = 0
+        self.rotate_flag = True
+        self.velocity = 0
+        self.velocity_message = Twist()
+        
+        self.publish_velocity = self.create_publisher(
+            Twist,
+            'cmd_vel',
+            qos_profile_sensor_data
+        )
 
         self.create_subscription(
             String,
@@ -25,23 +38,16 @@ class Control_System(Node):
             qos_profile_sensor_data,
             self.command_callback
         )
-
         self.create_subscription(
             Odometry,
             'odom',
             self.now_angular,
             qos_profile=qos_profile_sensor_data
         )
-        self.pub_vel = self.create_publisher(
-            Twist,
-            'cmd_vel',
-            qos_profile_sensor_data
-        )
-        self.angular = 0.0
+        
 
     def now_angular(self, message):
-        prinentation_z = message.pose.pose.orientation.z
-        self.angular = math.degrees(2 * math.asin(prinentation_z))
+        self.angular = math.degrees(2 * math.asin(message.pose.pose.orientation.z))
         print(self.angular)
 
     def command_callback(self, msg):
@@ -65,28 +71,24 @@ class Control_System(Node):
     def rotate(self, goal_angular):
         print('rotate')
 
-        privious_angular = self.angular
+        self.privious_angular = self.angular
 
-        operator = 0
-        flag = True
-
-        
-        while flag is True:
-            operator = calculate_speed.convertor(self.angular, privious_angular, operator)
-            if operator == 1:
-                velocity = calculate_speed.differencer(goal_angular, self.angular+360.0)
-            elif operator == -1:
-                velocity = calculate_speed.differencer(goal_angular, self.angular-360.0)
+        while self.rotate_flag is True:
+            self.operator = calculate_speed.convertor(self.angular, self.privious_angular, self.operator)
+            if self.operator == 1:
+                self.velocity = calculate_speed.differencer(goal_angular, self.angular+360.0)
+            elif self.operator == -1:
+                self.velocity = calculate_speed.differencer(goal_angular, self.angular-360.0)
             else:
-                velocity = calculate_speed.differencer(goal_angular, self.angular)
+                self.velocity = calculate_speed.differencer(goal_angular, self.angular)
             print(self.angular)
-            if velocity == 0:
+            if self.velocity == 0:
                 print('finish')
-                flag = False
-            velocity_message = Twist()
-            velocity_message.linear.x = 0.0
-            velocity_message.angular.z = velocity
-            self.pub_vel.publish(velocity_message)
+                self.rotate_flag = False
+                
+            self.velocity_message.linear.x = 0.0
+            self.velocity_message.angular.z = self.velocity
+            self.publish_velocity.publish(self.velocity_message)
 
 
 def main():
